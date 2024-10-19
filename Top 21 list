@@ -1,0 +1,141 @@
+1) Explain how you would handle a scenario where a method needs to be thread-safe but also efficient.
+
+1. Synchronized Blocks (Minimizing Scope)
+2. Use of volatile Keyword
+3. Atomic Variables
+4.ConcurrentHashMap :Unlike HashMap, which is not thread-safe, ConcurrentHashMap is designed to allow safe concurrent access from multiple threads without requiring external synchronization.
+5.Key Principles for Creating Immutable Objects in Java
+	a)Mark the class as final
+	b)Make all fields private and final
+	c) Do not provide setters
+
+2)If you encounter a NullPointerException in production, how would you resolve it?
+Stack Trace:
+Investigate the Cause:
+Fix:
+Logging and monitoring
+
+3)How do you implement exception handling in a Spring Boot REST API?
+@ControllerAdvice
+public class GlobalExceptionHandler {
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse("NOT_FOUND", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+    // Other exception handlers...
+}
+
+By using this approach, we ensure that our API responds with consistent and meaningful error messages, improving the client’s experience.
+
+3. How can you secure a Spring Boot application?
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.inMemoryAuthentication()
+            .withUser("user").password("{noop}password").roles("USER")
+            .and()
+            .withUser("admin").password("{noop}admin").roles("ADMIN");
+    }
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.csrf().disable()
+            .authorizeRequests()
+            .antMatchers("/admin/**").hasRole("ADMIN")
+            .antMatchers("/user/**").hasRole("USER")
+            .anyRequest().authenticated()
+            .and()
+            .formLogin().permitAll();
+    }
+}
+
+5. How would you implement caching in a Spring Boot application?
+<artifactId>spring-boot-starter-cache</artifactId>
+@Configuration
+@EnableCaching
+public class CacheConfig {
+    // Additional configurations if necessary
+}
+
+
+6. How do you implement asynchronous processing in a Spring Boot application?
+
+7. How do you monitor a Spring Boot application?
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+
+
+ 8)How do you handle circular dependencies in Spring Boot?
+ @Lazy annotation
+
+
+9)Handling configuration changes in a Spring Boot application without restarting it can be achieved using several approaches. Here are some common methods:
+
+a) we need one application.properties file with some below data 
+
+# Database configuration
+my.config.database.url=jdbc:mysql://localhost:3306/mydb
+# API configuration
+my.config.api.key=YOUR_API_KEY
+my.config.api.endpoint=https://api.example.com
+
+b) Implementation of MyConfigService Class
+@RefreshScope
+@Service
+public class MyConfigService {
+
+    @Value("${my.config.database.url}")
+    private String databaseUrl;
+
+    @Value("${my.config.api.key}")
+    private String apiKey;
+}    
+
+now to call the b)
+we need to add below in properties.yml
+
+management.endpoints.web.exposure.include=refresh  // Implented adding the actuator dependency
+
+ cURL: Open your terminal and execute the following command:
+ curl -X POST http://<your-host>:<your-port>/actuator/refresh
+
+ Now all your myConfifservice bean get refreshed with new values.
+
+or 
+You can also programmatically send a request from another Java application or service using RestTemplate
+@Service
+public class RefreshConfigService {
+
+    private final String refreshUrl = "http://<your-public-dns-or-ip>:<your-port>/actuator/refresh";
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    public void refreshConfig() {
+        try {
+            restTemplate.postForEntity(refreshUrl, null, String.class);
+            System.out.println("Configuration refreshed successfully.");
+        } catch (Exception e) {
+            System.err.println("Failed to refresh configuration: " + e.getMessage());
+        }
+    }
+}
+
+ ********************************************************************
+
+
+
+
+
+
+
+

@@ -1,0 +1,162 @@
+// we are not passing any data types
+ArrayList list = new ArrayList(); // it will have default type as Object
+list.add("sss");
+ list.add(67.9);
+double x = (double)list.get(1); //  we have to type cast the value;
+
+
+ Utility of generics
+ The syntax for a generic type is:
+
+ public class Box<T> { //  now here it can handle any data type when we create the object of the class.
+
+    private T value;
+    public T getValue() {
+        return value;
+    }
+
+    public void setValue(T value) {
+        this.value = value;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Box<Integer> box = new Box<>();  // now here we can pass Integer, String, what is out wish
+        box.setValue(1);  // No issue, it's an Integer
+        Integer i = box.getValue();  // No casting needed
+        System.out.println(i);
+
+        Box<String> box1 = new Box<>();  // It increase the code re useability
+        box1.setValue("DANCE");  // No issue, it's an String
+        String s = box1.getValue();  // No casting needed
+        System.out.println(s);
+    }
+}
+
+class Pair<K, V> {
+	private K key;
+    private V value;
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Pair<String, Integer> pair = new Pair<>("Age", 30);
+    }
+}
+
+Type Parameter Naming Conventions
+T: Type
+E: Element (used in collections)
+K: Key (used in maps)
+V: Value (used in maps)
+N: Number
+
+// Generic Interface
+
+interface Container<T> {
+    void add(T item);
+    T get();
+}
+public class GenericContainer<T> implements Container<T> { // YEAH BHI KAR SAKTE HAI
+
+public class GenericContainer<T> implements Container<String> {
+    private T item;
+    @Override
+    public void add(String item) {
+        this.item = (T) item;
+    }
+    @Override
+    public String get() {
+        return (String) item;
+    }
+
+    public static void main(String[] args) {
+        GenericContainer<String> x = new GenericContainer<>();
+        x.add("sss");
+        System.out.println(x.get());
+    }
+}
+
+// Bounded type parameters
+interface NumberContainer<T extends Number> {
+    void add(T item);
+    T get();
+}
+
+
+//the type parameter T is restricted to subclasses of Number, so only numeric types like Integer, Double, etc., can be used.
+class IntegerContainer implements NumberContainer<Integer> {
+    private Integer item;
+
+    @Override
+    public void add(Integer item) {
+        this.item = item;
+    }
+
+    @Override
+    public Integer get() {
+        return item;
+    }
+}
+
+// Bounded type parameters with abvance case mean a class extent nuber and implement another class.
+
+interface Printable {
+    void print();
+}
+
+class Mynumber extends Number implements Printable {
+    int value;
+
+    Mynumber(int value) {
+        this.value = value;
+    }
+
+    @Override
+    public void print() {
+
+    }
+
+    @Override
+    public int intValue() {
+        return 0;
+    }
+
+    @Override
+    public long longValue() {
+        return 0;
+    }
+
+    @Override
+    public float floatValue() {
+        return 0;
+    }
+
+    @Override
+    public double doubleValue() {
+        return 0;
+    }
+}
+public class Test<T extends Number & Printable> {
+    Mynumber n;
+    public Test(Mynumber n) {
+        this.n = n;
+    }
+
+    public void print() {
+        System.out.println(n.value);
+    }
+    
+    public static void main(String[] args) {
+        Test<Mynumber> x = new Test<>(new Mynumber(2));
+        x.print();
+    }
+}
+
+
+
+
+
+
+
